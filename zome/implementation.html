@@ -218,11 +218,11 @@ allocates memory and returns the value that the zome API function must return.</
 error enum variant.</p>
 <p>For an example implementation returning a complex struct see:</p>
 <ul>
-<li><code>agent::state::ActionResult::GetEntry</code> defining a result containing a <code>Pair</code> struct</li>
+<li><code>agent::state::ActionResponse::GetEntry</code> containing an <code>Entry</code> struct</li>
 <li><code>nucleus::ribosome::get::invoke_get</code>
 <ul>
 <li>match the action result against the correct enum variant</li>
-<li>serialize the pair using serde</li>
+<li>serialize the entry using serde</li>
 <li>return the result of <code>runtime_allocate_encode_str</code></li>
 <li>if the action result variant does NOT match then return <code>HcApiReturnCode::ErrorActionResult</code></li>
 </ul>
