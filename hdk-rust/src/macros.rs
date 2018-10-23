@@ -127,3 +127,81 @@ macro_rules! validations {
         )+
     );
 }
+
+#[macro_export]
+macro_rules! define_zome {
+    (
+        entries {
+            $(
+                $(#[$struct_meta:meta])*
+                struct $struct_name:ident {
+                    description: $description:expr,
+                    sharing: $sharing:path,
+                    schema: {
+                        $($field_name:ident: $field_type:ty),+
+                    },
+                    validation_package: || $val_pack_body:expr,
+                    validation_function: |&self, $ctx_ident:ident: ValidationPackage| $val_fn_body:expr
+                }
+            )*
+        }
+
+        capabilities {
+
+        }
+
+    ) => {
+
+        $(
+            $(#[$struct_meta])*
+            struct $struct_name {
+                $(pub $field_name : $field_type),+
+            }
+
+            impl $struct_name {
+                pub fn is_valid(&self, $ctx_ident : $crate::ValidationPackage) -> bool {
+                    $val_fn_body
+                }
+
+                pub fn validation_package() -> $crate::ValidationPackageDefinition {
+                    $val_pack_body
+                }
+            }
+        )+
+    };
+}
+
+use ValidationPackageDefinition;
+
+define_zome! {
+    entries {
+        struct BlogEntry {
+            description: "A blog entry",
+            sharing: Sharing::Public,
+            schema: {
+                content: String,
+                title: String
+            },
+            validation_package: || ValidationPackageDefinition::ChainFull,
+            validation_function: |&self, _ctx: ValidationPackage| {
+                true
+            }
+        }
+
+        struct Author {
+            description: "some description",
+            sharing: Sharing::Public,
+            schema: {
+                name: String
+            },
+            validation_package: || ValidationPackageDefinition::ChainFull,
+            validation_function: |&self, _ctx: ValidationPackage| {
+                true
+            }
+        }
+    }
+
+    capabilities {
+        
+    }
+}
